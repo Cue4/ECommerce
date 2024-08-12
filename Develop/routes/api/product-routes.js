@@ -4,13 +4,21 @@ const { Product, Category, Tag, ProductTag } = require('../../models');
 // The `/api/products` endpoint
 
 // get all products
-router.get('/', (req, res) => {
+router.get('/api/products', async(req, res) => {
+  const tags = await db.query('SELECT * FROM tags');
+  res.json(tags.rows);
   // find all products
   // be sure to include its associated Category and Tag data
 });
 
 // get one product
-router.get('/:id', (req, res) => {
+router.get('/api/product:id', async(req, res) => {
+  const { id } = req.params;
+  const tag = await db.query('SELECT * FROM tags WHERE id = $1', [id]);
+  if (tag.rows.length === 0) {
+      return res.status(404).json({ error: 'Tag not found' });
+  }
+  res.json(tag.rows[0]);
   // find a single product by its `id`
   // be sure to include its associated Category and Tag data
 });
@@ -92,7 +100,13 @@ router.put('/:id', (req, res) => {
     });
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/api/product:id', async(req, res) => {
+  const { id } = req.params;
+  const result = await db.query('DELETE FROM tags WHERE id = $1 RETURNING *', [id]);
+  if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Tag not found' });
+  }
+  res.status(204).send();
   // delete one product by its `id` value
 });
 
