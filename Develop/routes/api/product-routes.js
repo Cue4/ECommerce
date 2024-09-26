@@ -3,13 +3,13 @@ const { Product, Category, Tag, ProductTag } = require('../../models');
 
 
 // get all products
-router.get('/api/products', async(req, res) => {
-  const tags = await db.query('SELECT * FROM tags');
+router.get('/api/product', async(req, res) => {
+  const porduct = await db.query('SELECT * FROM product');
   res.json(tags.rows);
 });
 
 // get one product
-router.get('/api/product:id', async(req, res) => {
+router.get('/api/product/:id', async(req, res) => {
   const { id } = req.params;
   const tag = await db.query('SELECT * FROM tags WHERE id = $1', [id]);
   if (tag.rows.length === 0) {
@@ -19,7 +19,7 @@ router.get('/api/product:id', async(req, res) => {
 });
 
 // create new product
-router.post('/', (req, res) => {
+router.post('/api/product', (req, res) => {
   Product.create(req.body)
     .then((product) => {
       if (req.body.tagIds.length) {
@@ -42,7 +42,7 @@ router.post('/', (req, res) => {
 });
 
 // update product
-router.put('/:id', (req, res) => {
+router.put('/api/products/:id', (req, res) => {
   Product.update(req.body, {
     where: {
       id: req.params.id,
@@ -79,7 +79,7 @@ router.put('/:id', (req, res) => {
     });
 });
 
-router.delete('/api/product:id', async(req, res) => {
+router.delete('/api/product/:id', async(req, res) => {
   const { id } = req.params;
   const result = await db.query('DELETE FROM tags WHERE id = $1 RETURNING *', [id]);
   if (result.rows.length === 0) {
